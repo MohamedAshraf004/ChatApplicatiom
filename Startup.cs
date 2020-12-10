@@ -32,7 +32,6 @@ namespace ChatApp
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddScoped<IEmailSender, EmailSender>();
             services.AddDbContext<AppDbContext>(options=>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));

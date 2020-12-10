@@ -23,7 +23,7 @@ namespace ChatApp.Controllers
         public IActionResult Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var chats = _appDb.Chats.Include(x => x.Users).Include(x => x.Messages)
+            var chats = _appDb.Chats.Include(x => x.Users)
                     .Where(x => !x.Users.Any(y=>y.UserId==userId)).ToList();
             return View(chats);
         }
