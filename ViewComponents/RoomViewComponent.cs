@@ -1,4 +1,5 @@
 ﻿using ChatApp.Data;
+using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ namespace ChatApp.ViewComponents
         public IViewComponentResult Invoke()
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            return View(appDb.ChatUsers.Include(x=>x.Chat).Where(x=>x.UserId==userId).Select(x=>x.Chat).ToList());
+            return View(appDb.ChatUsers.Include(x=>x.Chat).Where(x=>x.UserId==userId && x.Chat.Type==ChatType.Group).Select(x=>x.Chat).ToList());
         }
 
     }

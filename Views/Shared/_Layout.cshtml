@@ -12,17 +12,17 @@
     <body>
         <div class="navbar align-content-center">
             <partial name="_LoginPartial" />
-
+            <div class="btn-group text-white">
+                <a asp-controller="Home" class="text-white btn btn-success" asp-action="Index">Home</a>
+                <a asp-controller="Home" class="text-white btn btn-success" asp-action="Find">Find</a>
+                <a asp-controller="Home" class="text-white btn btn-success" asp-action="PrivateChats">Private</a>
+            </div>
         </div>
         <div class="main">
             @if (User.Identity.IsAuthenticated)
             {
                 <vc:room ></vc:room>
             }
-            <!-- Button trigger modal -->
-            @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                Create New Chat
-            </button>*@
 
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

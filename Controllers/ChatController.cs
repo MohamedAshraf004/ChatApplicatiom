@@ -21,31 +21,31 @@ namespace ChatApp.Controllers
         {
             this._hub = hub;
         }
-        [HttpPost("[action]/{connectionId}/{roomName}")]
-        public async Task<IActionResult> JoinRoom(string connectionId,string roomName)
+        [HttpPost("[action]/{connectionId}/{roomId}")]
+        public async Task<IActionResult> JoinRoom(string connectionId,string roomId)
         {
-            await _hub.Groups.AddToGroupAsync(connectionId, roomName);
+            await _hub.Groups.AddToGroupAsync(connectionId, roomId);
             return Ok();
         }
-        [HttpPost("[action]/{connectionId}/{roomName}")]
-        public async Task<IActionResult> LeaveRoom(string connectionId, string roomName)
+        [HttpPost("[action]/{connectionId}/{roomId}")]
+        public async Task<IActionResult> LeaveRoom(string connectionId, string roomId)
         {
-            await _hub.Groups.RemoveFromGroupAsync(connectionId, roomName);
+            await _hub.Groups.RemoveFromGroupAsync(connectionId, roomId);
             return Ok();
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult> SendMessage(int chatId, string roomName, string message, [FromServices] AppDbContext context)
+        public async Task<IActionResult> SendMessage(int roomId, string message, [FromServices] AppDbContext context)
         {
             Message Message = new Message
             {
                 Text = message,
-                ChatId = chatId,
+                ChatId = roomId,
                 Name = User.Identity.Name.Split(new char[] { '@' }).FirstOrDefault(),
                 TimeStamp = DateTime.Now
             };
             await context.Messages.AddAsync(Message);
             await context.SaveChangesAsync();
-            await _hub.Clients.Group(roomName).SendAsync("RecieveMessage", new {
+            await _hub.Clients.Group(roomId.ToString()).SendAsync("RecieveMessage", new {
                 Text=Message.Text,
                 ChatId=Message.ChatId,
                 Name=Message.Name,

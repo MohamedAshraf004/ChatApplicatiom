@@ -61,6 +61,12 @@ namespace ChatApp.Controllers
             return View(users);
         }
 
+        public IActionResult PrivateChats()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return View(_appDb.Chats.Include(x => x.Users).ThenInclude(x=>x.User).Where(x => x.Users.Any(y=>y.UserId == userId)  && x.Type == ChatType.Private).ToList());
+        }
+
         public async Task<IActionResult> CreatePrivateRoom(string userId)
         {
             var chat = new Chat
