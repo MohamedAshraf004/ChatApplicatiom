@@ -33,19 +33,24 @@ namespace ChatApp.Controllers
             await _hub.Groups.RemoveFromGroupAsync(connectionId, roomName);
             return Ok();
         }
-
-        public async Task<IActionResult> SendMessage(int chatId, string message,string roomName,[FromServices] AppDbContext context)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SendMessage(int chatId, string roomName, string message, [FromServices] AppDbContext context)
         {
-            Messages msg = new Messages
+            Message Message = new Message
             {
                 Text = message,
                 ChatId = chatId,
                 Name = User.Identity.Name.Split(new char[] { '@' }).FirstOrDefault(),
                 TimeStamp = DateTime.Now
             };
-            await context.Messages.AddAsync(msg);
+            await context.Messages.AddAsync(Message);
             await context.SaveChangesAsync();
-            await _hub.Clients.Group(roomName).SendAsync("RecieveMessage",msg);
+            await _hub.Clients.Group(roomName).SendAsync("RecieveMessage", new {
+                Text=Message.Text,
+                ChatId=Message.ChatId,
+                Name=Message.Name,
+                TimeStamp=Message.TimeStamp.ToString("dd/MM/yyyy HH:mm:ss")
+            });
             return Ok();
         }
     }

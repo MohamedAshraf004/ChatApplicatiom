@@ -19,10 +19,11 @@ namespace ChatApp.Controllers
         {
             this._appDb = appDb;
         }
+
         public IActionResult Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var chats = _appDb.Chats.Include(x => x.Users)
+            var chats = _appDb.Chats.Include(x => x.Users).Include(x => x.Messages)
                     .Where(x => !x.Users.Any(y=>y.UserId==userId)).ToList();
             return View(chats);
         }
@@ -48,15 +49,44 @@ namespace ChatApp.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        [HttpGet("{id}")]
-        public IActionResult Chat(int id) => View(_appDb.Chats.Include(msg => msg.Messages).FirstOrDefault(x => x.Id == id));
+
+        public IActionResult Chat(int id)
+        {
+            return View(_appDb.Chats.Include(msg => msg.Messages).FirstOrDefault(x => x.Id == id));
+        }
+
+        public IActionResult Find()
+        {
+            var users = _appDb.Users.Where(x => x.Id != User.FindFirst(ClaimTypes.NameIdentifier).Value).ToList();
+            return View(users);
+        }
+
+        public async Task<IActionResult> CreatePrivateRoom(string userId)
+        {
+            var chat = new Chat
+            {
+                Type = ChatType.Private
+            };
+            chat.Users.Add(new ChatUser
+            {
+                UserId = userId
+            });
+            chat.Users.Add(new ChatUser
+            {
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value
+            });
+            await _appDb.Chats.AddAsync(chat);
+            await _appDb.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Chat), new { id = chat.Id });
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddMessage(int chatId, string message)
         {
             if (ModelState.IsValid)
             {
-                Messages msg = new Messages
+                Message msg = new Message
                 {
                     Text = message,
                     ChatId = chatId,
