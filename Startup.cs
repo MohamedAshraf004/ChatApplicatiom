@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChatApp.Data;
+using ChatApp.Hubs;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +53,8 @@ namespace ChatApp
                 options.LogoutPath = "/Identity/Account/Logout";
                 options.LoginPath = "/Identity/Account/Login";
             });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +73,7 @@ namespace ChatApp
             {
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chathub");
 
             });
         }
